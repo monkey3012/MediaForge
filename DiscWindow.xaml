@@ -1,0 +1,52 @@
+<Window x:Class="MediaForge.DiscWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Disc Import" Width="980" Height="660" WindowStartupLocation="CenterOwner">
+    <Grid Margin="18">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TextBlock Text="Import Disc" FontSize="26" FontWeight="Bold"/>
+        <DockPanel Grid.Row="1" Margin="0,16,0,12">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <Button Content="Eject" Width="80" Height="32" Margin="6,0,0,0" Click="Eject_Click"/>
+                <Button Content="Refresh Drives" Width="120" Height="32" Margin="6,0,0,0" Click="RefreshDrives_Click"/>
+                <Button Content="Scan Disc" Width="110" Height="32" Margin="6,0,0,0" Click="Scan_Click"/>
+            </StackPanel>
+            <TextBlock Text="Drive:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <ComboBox x:Name="DriveBox" Width="520" DisplayMemberPath="DisplayName"/>
+        </DockPanel>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2.1*"/>
+                <ColumnDefinition Width="1.2*"/>
+            </Grid.ColumnDefinitions>
+            <DataGrid x:Name="TitlesGrid" Grid.Column="0" AutoGenerateColumns="False" SelectionMode="Extended" SelectionUnit="FullRow" IsReadOnly="False">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="Rip" Binding="{Binding IsSelected, Mode=TwoWay}" Width="55"/>
+                    <DataGridTextColumn Header="Title" Binding="{Binding DisplayTitle}" Width="70"/>
+                    <DataGridTextColumn Header="Duration" Binding="{Binding DisplayDuration}" Width="110"/>
+                    <DataGridTextColumn Header="Size" Binding="{Binding DisplaySize}" Width="100"/>
+                    <DataGridTextColumn Header="Chapters" Binding="{Binding Chapters}" Width="85"/>
+                    <DataGridTextColumn Header="Video" Binding="{Binding VideoTracks}" Width="70"/>
+                    <DataGridTextColumn Header="Audio" Binding="{Binding AudioTracks}" Width="70"/>
+                    <DataGridTextColumn Header="Main Score" Binding="{Binding MainScore}" Width="90"/>
+                    <DataGridCheckBoxColumn Header="Likely Main" Binding="{Binding IsLikelyMainTitle, Mode=OneWay}" Width="90" IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Border Grid.Column="1" Margin="12,0,0,0" BorderBrush="#374151" BorderThickness="1" Background="#05070A" Padding="8">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                        <TextBlock Text="MakeMKV Live Output" FontWeight="SemiBold" Foreground="#F9FAFB"/>
+                        <TextBlock x:Name="LiveCommandText" Text="Waiting for MakeMKV..." FontSize="11" Foreground="#9CA3AF" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <TextBox x:Name="DiscConsoleText" IsReadOnly="True" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="11" Background="#05070A" Foreground="#D1D5DB" BorderThickness="0"/>
+                </DockPanel>
+            </Border>
+        </Grid>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <TextBlock x:Name="StatusText" VerticalAlignment="Center" Margin="0,0,18,0"/>
+            <Button Content="Cancel" Width="90" Margin="6" Click="Cancel_Click"/>
+            <Button Content="Identify" Width="100" Margin="6" Click="IdentifySelected_Click"/>
+            <Button Content="Rip Selected" Width="120" Margin="6" Click="Rip_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
