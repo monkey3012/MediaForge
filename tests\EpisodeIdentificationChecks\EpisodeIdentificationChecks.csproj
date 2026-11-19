@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src\MediaForge\Services\EpisodeIdentificationService.cs" Link="EpisodeIdentificationService.cs" />
+    <Compile Include="..\..\src\MediaForge\Services\EpisodeStructureService.cs" Link="EpisodeStructureService.cs" />
+    <Compile Include="..\..\src\MediaForge\Models\MediaJob.cs" Link="MediaJob.cs" />
+    <Compile Include="..\..\src\MediaForge\Models\MediaSourceKind.cs" Link="MediaSourceKind.cs" />
+    <Compile Include="..\..\src\MediaForge\Models\TmdbModels.cs" Link="TmdbModels.cs" />
+    <Compile Include="..\..\src\MediaForge\Models\TmdbEpisodeGroupModels.cs" Link="TmdbEpisodeGroupModels.cs" />
+    <Compile Include="..\..\src\MediaForge\Services\DvdEpisodeGroupMatcher.cs" Link="DvdEpisodeGroupMatcher.cs" />
+    <Compile Include="..\..\src\MediaForge\Services\TitleCardOcrService.cs" Link="TitleCardOcrService.cs" />
+    <Compile Include="..\..\src\MediaForge\Services\ProcessRunner.cs" Link="ProcessRunner.cs" />
+    <Compile Include="..\..\src\MediaForge\Services\MediaForgeLogger.cs" Link="MediaForgeLogger.cs" />
+
+
+  </ItemGroup>
+</Project>
+
+

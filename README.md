@@ -145,7 +145,7 @@ Naruto.mkv
  └─ chapters 7-8 → S01E04
 ```
 
-Automatic mapping still requires additional implementation and review UI before it should be considered complete.
+Automatic detection and review are now implemented for ripped disc sources. MediaForge uses source runtime plus TMDB episode runtimes to estimate the number of episodes in a title, then proposes chapter ranges for review. It does not use raw file size to decide the episode count.
 
 ## Space management
 
@@ -198,3 +198,40 @@ This revision adds the requested identification and workflow UI improvements:
 - **Dark mode / light mode** is persisted in Settings and can also be toggled from the main window.
 
 > Build note: the source package is statically validated here (XAML parsing and archive integrity). The assistant environment does not have the .NET SDK installed, so a Windows `dotnet publish` was not performed in this environment.
+
+
+### Fix 10 notes
+- Replaced the runtime ComboBox style TargetName setters that caused WPF popup crashes.
+- Added an explicit readable ComboBox template for non-editable dropdowns and themed the nested TV Episode dropdown.
+- Corrected dark ComboBox item foreground colors.
+- File Name and Source Name are now one queue field; identification no longer duplicates them.
+
+
+### Fix 12 — Multi-episode source detection
+
+This revision adds the first complete multi-episode TV workflow for large DVD/Blu-ray titles:
+
+- MakeMKV `CINFO` data is used to retain **DVD vs Blu-ray** source type.
+- MakeMKV title runtime and chapter count are persisted with each ripped job.
+- MakeMKV segment count/map metadata is retained for future structural analysis.
+- Main-title scoring no longer treats large file size as a primary signal.
+- TMDB episode `runtime` is loaded with season episodes.
+- A new structure analyzer compares the source runtime to the season's median episode runtime.
+- Strong ratios such as roughly `92 minutes / 23 minutes = 4 episodes` are automatically identified as likely multi-episode sources.
+- The analyzer deliberately avoids deciding from size alone, so a large Blu-ray single episode is not automatically split just because it is large.
+- When chapter count supports the estimated episode count, MediaForge proposes equal chapter groups as a **starting point**, clearly marked for review.
+- High-confidence multi-episode sources are expanded into separate mapping rows and, when applied, become separate MediaForge jobs that share the original MKV but use different HandBrake `--chapters` ranges.
+- The first segment reuses the original queue job ID so an already-built processing queue does not lose its reference; additional episodes receive new job IDs.
+- Suggested split rows display the confidence and chapter range so the user can correct boundaries before encoding.
+- Existing/previously encoded jobs are not automatically split.
+- If runtime metadata is unavailable, MediaForge falls back to a conservative review state instead of guessing from file size.
+
+Example: a DVD title reported as approximately 92 minutes with a season whose episodes are approximately 23 minutes each can be shown as **Likely 4 episodes** with suggested chapter ranges such as `1-5`, `6-10`, `11-15`, `16-20`. These ranges are suggestions only; actual episode boundaries can vary and should be reviewed before applying.
+
+
+### Fix 13 — Animated claw hammer
+
+- Replaced the crossed-hammers glyph with a clearly shaped claw hammer, including a wood-toned handle, metal head and claw.
+- The hammer pivots at the end of its handle and repeatedly strikes while a job is active. Motion no longer depends on HandBrake progress callbacks.
+- The hammer rests when no job is active.
+- This is a source-level UI change and still requires a Windows build/publish test.
