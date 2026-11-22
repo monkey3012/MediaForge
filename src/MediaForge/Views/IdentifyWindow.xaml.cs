@@ -135,7 +135,7 @@ public partial class IdentifyWindow : Window
         name = Regex.Replace(name, @"^[\s\-_:]+|[\s\-_:]+$", "");
 
         if (Regex.IsMatch(name, @"^(?:disc|disk)?\s*\d{1,3}$", RegexOptions.IgnoreCase)) return "";
-        if (Regex.IsMatch(name, @"^(?:title|track|stream)\s*\d{1,3}$", RegexOptions.IgnoreCase)) return "";
+        if (Regex.IsMatch(name, @"^(?:title|track|stream|playlist)(?:\s*\d{1,3})?$", RegexOptions.IgnoreCase)) return "";
         return name;
     }
 
