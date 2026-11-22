@@ -15,7 +15,8 @@ namespace MediaForge;
 
 public partial class MainWindow : Window
 {
-    private readonly JobDatabase _db = new();
+    private JobDatabase _db = null!;
+    private bool _databaseReady;
     private readonly SettingsService _settingsSvc = new();
     private readonly MakeMkvService _makeMkv = new(new ProcessRunner());
     private readonly ProcessConsoleWindow _console = new();
@@ -41,17 +42,49 @@ public partial class MainWindow : Window
         ThemeManager.Apply(this, _settings.IsDarkMode);
         ThemeButton.Content = _settings.IsDarkMode ? "Light Mode" : "Dark Mode";
         Activated += MainWindow_Activated;
-        Refresh();
+        Loaded += MainWindow_Loaded;
+        FooterStatusText.Text = "Loading processing list...";
         MediaForgeLogger.Info("Main window initialized.");
     }
 
-    private void MainWindow_Activated(object? sender, EventArgs e) => Refresh();
+    private void MainWindow_Activated(object? sender, EventArgs e)
+    {
+        if (_databaseReady && _discWindow?.IsVisible == true) Refresh();
+    }
 
-    private void Refresh()
+    private async void MainWindow_Loaded(object? sender, RoutedEventArgs e)
+    {
+        Loaded -= MainWindow_Loaded;
+        IsEnabled = false;
+        try
+        {
+            var initialState = await Task.Run(() =>
+            {
+                var database = new JobDatabase();
+                return (Database: database, Jobs: database.LoadAll());
+            });
+            _db = initialState.Database;
+            _databaseReady = true;
+            Refresh(initialState.Jobs);
+        }
+        catch (Exception ex)
+        {
+            MediaForgeLogger.Error("Could not load the processing list.", ex);
+            FooterStatusText.Text = "Could not load the processing list.";
+            MessageBox.Show($"MediaForge could not load its processing list.\n\n{ex.Message}", "MediaForge Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            Close();
+        }
+        finally
+        {
+            IsEnabled = true;
+        }
+    }
+
+    private void Refresh(IReadOnlyList<MediaJob>? loadedJobs = null)
     {
         var selectedIds = JobsGrid.SelectedItems.Cast<MediaJob>().Select(x => x.Id).ToHashSet();
         JobsGrid.ItemsSource = null;
-        JobsGrid.ItemsSource = _db.LoadAll();
+        JobsGrid.ItemsSource = loadedJobs ?? _db.LoadAll();
 
         foreach (var item in JobsGrid.Items.Cast<object>().OfType<MediaJob>())
         {
@@ -322,7 +355,7 @@ public partial class MainWindow : Window
                         await wf.EncodeExistingAsync(
                             job,
                             _settings,
-                            changed: _ => Dispatcher.InvokeAsync(Refresh),
+                            changed: _ => Dispatcher.InvokeAsync(() => Refresh()),
                             token: _activeJobCts.Token,
                             liveOutput: line => _console.Append(line),
                             processStarted: (exe, args) => _console.StartProcess(exe, args));
@@ -333,7 +366,7 @@ public partial class MainWindow : Window
                         !string.IsNullOrWhiteSpace(job.Title) &&
                         job.Year != null)
                     {
-                        wf.Organize(job, _settings, _ => Dispatcher.InvokeAsync(Refresh));
+                        wf.Organize(job, _settings, _ => Dispatcher.InvokeAsync(() => Refresh()));
                     }
                     else if (job.Status == JobStatus.Encoded)
                     {
